@@ -1,29 +1,28 @@
 import db from '../database/connection.js';
 
 async function getSubscriptions() {
-    return await db.all("SELECT * FROM subscription")
+    const [results] = await db.query('SELECT * FROM subscription');
+    return results;
 }
 
 async function getSubscriptionByPayloadUrl(payloadUrl) {
-    return await db.get('SELECT * FROM subscription WHERE payload_url = ?', payloadUrl);
+    const [result] = await db.execute('SELECT * FROM subscription WHERE payload_url = ?', [payloadUrl]);
+    return result[0];
 }
 
 async function createSubscription(subscription) {
-    const existingEventTypes = await db.all("SELECT * FROM event");
+    const [existingEventTypes] = await db.query("SELECT * FROM event");
     const eventsToAdd = existingEventTypes.filter((eventToAdd) => {
         return !subscription.events.includes(eventToAdd.eventType);
     })
 
     if (eventsToAdd) {
         console.log('Creating subscription', subscription);
-        const subscriptionStmt = await db.prepare("INSERT INTO subscription (payload_url) VALUES (?)");
-        const result = await subscriptionStmt.run(subscription.payloadUrl);
-        const subscriptionEventsStmt = await db.prepare("INSERT INTO subscription_event (subscription_id, event_id) VALUES (?, ?)");
+        const createdSubscription = await db.execute("INSERT INTO subscription (payload_url) VALUES (?)", [subscription.payloadUrl]);
 
         for (const eventToAdd of eventsToAdd) {
-            await subscriptionEventsStmt.run([result.lastID, eventToAdd.id]);
+            await db.execute("INSERT INTO subscription_event (subscription_id, event_id) VALUES (?, ?)", [createdSubscription[0].insertId, eventToAdd.id])
         }
-        await subscriptionStmt.finalize();
     }
 }
 

@@ -1,29 +1,33 @@
 import db from './connection.js'
 
-await db.run(
-    `CREATE TABLE IF NOT EXISTS subscription (
-    id INTEGER PRIMARY KEY, 
-    payload_url TEXT NOT NULL UNIQUE
-    );`
-    );
+await db.execute(`
+    DROP TABLE IF EXISTS subscription_event, subscription, event;
+`);
 
-await db.run(
-    `CREATE TABLE IF NOT EXISTS event (
-    id INTEGER PRIMARY KEY,
-    event_type TEXT NOT NULL UNIQUE
-    );`
-    );
 
-await db.run(
-    `CREATE TABLE IF NOT EXISTS subscription_event (
-    id INTEGER PRIMARY KEY,
-    subscription_id INTEGER,
-    event_id INTEGER,
-    FOREIGN KEY (subscription_id) REFERENCES subscription(id),
-    FOREIGN KEY (event_id) REFERENCES event(id)
-    );`
+await db.query(`
+    CREATE TABLE IF NOT EXISTS subscription (
+        id INT AUTO_INCREMENT PRIMARY KEY, 
+        payload_url VARCHAR(200) NOT NULL UNIQUE
     );
-await db.exec('INSERT INTO event (event_type) VALUES ("test event")');
-await db.exec('INSERT INTO event (event_type) VALUES ("test event 2")');
+    
+    CREATE TABLE IF NOT EXISTS event (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(60) NOT NULL UNIQUE
+    );
+    
+    CREATE TABLE IF NOT EXISTS subscription_event (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        subscription_id INT,
+        event_id INT,
+        FOREIGN KEY (subscription_id) REFERENCES subscription(id),
+        FOREIGN KEY (event_id) REFERENCES event(id)
+    );
+`);
 
-await db.close();
+await db.query(
+    `INSERT INTO event (name) VALUES ("test event");
+     INSERT INTO event (name) VALUES ("test event 2");
+     `);
+
+await db.end();

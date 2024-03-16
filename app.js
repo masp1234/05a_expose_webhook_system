@@ -13,27 +13,32 @@ app.use(express.json());
 app.get("/ping", async (req, res) => {
         const subscriptions = await getSubscriptions();
 
-        const responses = await Promise.all(subscriptions.map(async (subscription) => {
-            try {
-                const response =  await fetch(subscription.payload_url, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                      },
-                    body: JSON.stringify({
-                        message: "This is a ping test"
+        if (subscriptions.length === 0) {
+            console.log('Ping requested but no subscribers found.');
+        }
+        else {
+            const responses = await Promise.all(subscriptions.map(async (subscription) => {
+                try {
+                    const response =  await fetch(subscription.payload_url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                          },
+                        body: JSON.stringify({
+                            message: "This is a ping test"
+                        })
                     })
-                })
-                return response
-            }
-            catch {
-                console.log(`No host found with payload URL: ${subscription.payload_url}`)
-            }         
-        }))
-        const filteredResponses = responses.filter((response) => response !== undefined)
-        filteredResponses.length === subscriptions.length
-            ? console.log('All subscribers are up.')
-            : console.log(`${filteredResponses.length} out of ${subscriptions.length} subscribers are up.`);
+                    return response
+                }
+                catch {
+                    console.log(`No host found with payload URL: ${subscription.payload_url}`)
+                }         
+            }))
+            const filteredResponses = responses.filter((response) => response !== undefined)
+            filteredResponses.length === subscriptions.length
+                ? console.log('All subscribers are up.')
+                : console.log(`${filteredResponses.length} out of ${subscriptions.length} subscribers are up.`);         
+        }
 
         res.status(200).send({ message: "Ping requested successfully."});
     })

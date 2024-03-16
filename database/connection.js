@@ -1,11 +1,11 @@
-import sqlite3 from 'sqlite3'
-import { open } from 'sqlite'
+import mysql from 'mysql2/promise';
 
-const db = await open({
-    filename: './sqlite.db',
-    driver: sqlite3.Database
-  });
-  
-await db.exec('PRAGMA foreign_keys = 1');
+const connection = await mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  database: 'webhook_db',
+  password: '123123',
+  multipleStatements: true
+})
 
-export default db;
+export default connection;
