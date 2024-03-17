@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import { 
     getSubscriptions,
@@ -7,7 +8,6 @@ import {
 
 const app = express();
 
-app.use(express.static("public"));
 app.use(express.json());
 
 app.get("/ping", async (req, res) => {
@@ -59,6 +59,6 @@ app.post("/subscribe", async (req, res) => {
     res.status(201).send('You are subscribed');
 })
 
-const PORT = 8080;
+const PORT = Number(process.env.PORT) || 8080;
 
 app.listen(PORT, () => console.log('Server is listening on port', PORT));
