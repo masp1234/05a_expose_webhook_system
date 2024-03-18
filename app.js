@@ -65,7 +65,7 @@ app.post("/subscribe", async (req, res) => {
 
 app.delete("/unsubscribe", async(req, res) => {
     const { payloadUrl } = req.query;
-    console.log(payloadUrl);
+    
     if (!payloadUrl) {
         return res.status(400).send({ message: 'You need to provide a payloadUrl to delete a subscription.' })
     }
