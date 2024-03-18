@@ -76,10 +76,26 @@ If you don't encounter any problems, you should now be subscribed to the ```new 
 ### Ping
 ```https://05a-expose-webhook-system.vercel.app/ping```
 
-Making a ```GET``` request to this will trigger all the events you are subscribed to, which means that you will recieve a ```POST``` request containing a payload for all of the events you are subscribed to.
+Making a ```GET``` request to this will trigger all the events you are subscribed to, which means that you will recieve a ```POST``` request containing a payload for each of the events.
 
+### How an event payload looks like in JSON format
+```
+{
+    "payload": {
+        "event": {
+            "name": "product discontinued"
+        }
+    }
+}
+```
 
 ### Unsubscribing all your webhooks
+
+By making a ```DELETE``` Request to the below URL url with your endpoint as a query parameter in place of ```<your endpoint>```, you will unsubscribe to all the webhooks events that are subscribed to that endpoint.
+
+```https://05a-expose-webhook-system.vercel.app/unsubscribe?payloadUrl=<your endpoint>```
+
+
 
 
 
