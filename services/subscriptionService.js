@@ -10,13 +10,25 @@ async function getSubscriptionByPayloadUrl(payloadUrl) {
     return result[0];
 }
 
-async function createSubscription(subscription) {
-    const [existingEventTypes] = await db.query("SELECT * FROM event");
-    const eventsToAdd = existingEventTypes.filter((eventToAdd) => {
-        return !subscription.events.includes(eventToAdd.eventType);
-    })
+async function getSubscribedEventsBySubscriptionId(subscriptionId) {
+    const [ results ] = await db.execute(`
+        SELECT event.*
+        FROM event
+        JOIN subscription_event ON event.id = subscription_event.event_id
+        JOIN subscription ON subscription_event.subscription_id = subscription.id
+        WHERE subscription.id = ?;`, [subscriptionId]);
 
-    if (eventsToAdd) {
+        return results;
+}
+
+async function createSubscription(subscription) {
+    const [existingEvents] = await db.query("SELECT * FROM event");
+    console.log(existingEvents);
+    const eventsToAdd = existingEvents.filter((existingEvent) => {
+        return subscription.events.includes(existingEvent.name);
+    });
+
+    if (eventsToAdd.length > 0) {
         console.log('Creating subscription', subscription);
         const createdSubscription = await db.execute("INSERT INTO subscription (payload_url) VALUES (?)", [subscription.payloadUrl]);
 
@@ -26,8 +38,14 @@ async function createSubscription(subscription) {
     }
 }
 
+async function deleteSubscription(payloadUrl) {
+    await db.execute("DELETE FROM subscription WHERE payload_url=?", [payloadUrl])
+}
+
 export {
     getSubscriptions,
     getSubscriptionByPayloadUrl,
-    createSubscription
+    getSubscribedEventsBySubscriptionId,
+    createSubscription,
+    deleteSubscription
 }

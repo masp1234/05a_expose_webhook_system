@@ -20,14 +20,21 @@ await db.query(`
         id INT AUTO_INCREMENT PRIMARY KEY,
         subscription_id INT,
         event_id INT,
-        FOREIGN KEY (subscription_id) REFERENCES subscription(id),
-        FOREIGN KEY (event_id) REFERENCES event(id)
+        FOREIGN KEY (subscription_id) REFERENCES subscription(id) ON DELETE CASCADE,
+        FOREIGN KEY (event_id) REFERENCES event(id) ON DELETE CASCADE
     );
 `);
 
 await db.query(
-    `INSERT INTO event (name) VALUES ("test event");
-     INSERT INTO event (name) VALUES ("test event 2");
+    `INSERT INTO event (name) VALUES ("new product");
+     INSERT INTO event (name) VALUES ("product removed");
+     INSERT INTO event (name) VALUES ("product updated");
+     INSERT INTO event (name) VALUES ("product back in stock");
+     INSERT INTO event (name) VALUES ("product out of stock");
+     INSERT INTO event (name) VALUES ("product price change");
+     INSERT INTO event (name) VALUES ("product stock update");
+     INSERT INTO event (name) VALUES ("product discontinued");
+     INSERT INTO event (name) VALUES ("new product review");
      `);
 
 await db.end();
