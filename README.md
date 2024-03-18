@@ -1,5 +1,5 @@
 ## Required setup
-- Have Postman ready or another way to make a POST request
+- Have Postman ready or another way to make HTTP requests
 - An endpoint that can receive POST requests
 
 
