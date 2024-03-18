@@ -13,8 +13,6 @@ const app = express();
 app.use(express.json());
 
 app.get("/ping", async (req, res) => {
-    res.status(200).send({ message: "Ping requested successfully."})
-
     const subscriptions = await getSubscriptions();
 
     await subscriptions.map(async (subscription) => {
@@ -41,7 +39,7 @@ app.get("/ping", async (req, res) => {
             }          
         })
     })
-
+    res.status(200).send({ message: "Ping requested successfully."})
 })
 
 app.post("/subscribe", async (req, res) => {
